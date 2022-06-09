@@ -25,7 +25,8 @@ static char *cmdline_end;
 
 struct tmate_settings _tmate_settings = {
 	.keys_dir        	= TMATE_SSH_DEFAULT_KEYS_DIR,
-	.ssh_port        	= TMATE_SSH_DEFAULT_PORT,
+	.daemon_ssh_port        = TMATE_SSH_DEFAULT_PORT_DAEMON,
+	.client_ssh_port        = TMATE_SSH_DEFAULT_PORT_CLIENT,
 	.ssh_port_advertized    = -1,
 	.websocket_hostname  	= NULL,
 	.bind_addr	 	= NULL,
@@ -49,7 +50,7 @@ void request_server_termination(void)
 
 static void usage(void)
 {
-	fprintf(stderr, "usage: tmate-ssh-server [-b ip] [-h hostname] [-k keys_dir] [-p listen_port] [-q ssh_port_advertized] [-w websocket_hostname] [-z websocket_port] [-x] [-v]\n");
+	fprintf(stderr, "usage: tmate-ssh-server [-b ip] [-h hostname] [-k keys_dir] [-p listen_port_daemon] [-c listen_port_client] [-q ssh_port_advertized] [-w websocket_hostname] [-z websocket_port] [-x] [-v]\n");
 }
 
 static char* get_full_hostname(void)
@@ -120,7 +121,7 @@ int main(int argc, char **argv, char **envp)
 {
 	int opt;
 
-	while ((opt = getopt(argc, argv, "b:h:k:p:q:w:z:xv")) != -1) {
+	while ((opt = getopt(argc, argv, "b:h:k:p:c:q:w:z:xv")) != -1) {
 		switch (opt) {
 		case 'b':
 			tmate_settings->bind_addr = xstrdup(optarg);
@@ -132,7 +133,10 @@ int main(int argc, char **argv, char **envp)
 			tmate_settings->keys_dir = xstrdup(optarg);
 			break;
 		case 'p':
-			tmate_settings->ssh_port = atoi(optarg);
+			tmate_settings->daemon_ssh_port = atoi(optarg);
+			break;
+		case 'c':
+			tmate_settings->client_ssh_port = atoi(optarg);
 			break;
 		case 'q':
 			tmate_settings->ssh_port_advertized = atoi(optarg);
@@ -186,7 +190,9 @@ int main(int argc, char **argv, char **envp)
 			    "Try deleting " TMATE_WORKDIR " and try again");
 
 	tmate_ssh_server_main(tmate_session,
-			      tmate_settings->keys_dir, tmate_settings->bind_addr, tmate_settings->ssh_port);
+			      tmate_settings->keys_dir, tmate_settings->bind_addr,
+			      tmate_settings->daemon_ssh_port,
+			      tmate_settings->client_ssh_port);
 	return 0;
 }
 
