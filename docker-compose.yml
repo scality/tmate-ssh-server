@@ -1,0 +1,17 @@
+version: '3'
+services:
+  tmate-ssh-server:
+    image: tmate-ssh-server
+    environment:
+      - SSH_PORT_LISTEN_DAEMON=2200
+      - SSH_PORT_LISTEN_CLIENT=2201
+      - USE_PROXY_PROTOCOL=0
+      - SSH_KEYS_PATH=/etc/tmate-ssh-server/keys
+      - SSH_HOSTNAME=${SSH_HOSTNAME}
+    volumes:
+      - ${HOME}/keys/:/etc/tmate-ssh-server/keys
+    ports:
+      - ${SSH_PORT_LISTEN_DAEMON}:2200
+      - ${SSH_PORT_LISTEN_CLIENT}:2201
+    cap_add:
+      - SYS_ADMIN
