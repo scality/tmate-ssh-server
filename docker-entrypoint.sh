@@ -13,7 +13,7 @@ if [ -n "${WEBSOCKET_HOSTNAME}" ]; then
   set -- -w "${WEBSOCKET_HOSTNAME}" "$@"
 fi
 
-if [ ! -z "${SSH_HOSTNAME}" ]; then
+if [ -n "${SSH_HOSTNAME}" ]; then
   set -- -h "${SSH_HOSTNAME}" "$@"
 fi
 
