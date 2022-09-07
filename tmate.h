@@ -173,15 +173,18 @@ struct tmate_ssh_client {
 };
 
 extern void tmate_ssh_server_main(struct tmate_session *session,
-				  const char *keys_dir, const char *bind_addr, int port);
+                                  const char *keys_dir, const char *bind_addr,
+                                  int daemon_port, int client_port);
 
 /* tmate-main.c */
 
 #ifdef DEVENV
-#define TMATE_SSH_DEFAULT_PORT 2200
+#define TMATE_SSH_DEFAULT_PORT_DAEMON 2200
 #else
-#define TMATE_SSH_DEFAULT_PORT 22
+#define TMATE_SSH_DEFAULT_PORT_DAEMON 22
 #endif
+
+#define TMATE_SSH_DEFAULT_PORT_CLIENT 2201
 
 #define TMATE_SSH_GRACE_PERIOD 20
 
@@ -196,7 +199,8 @@ extern void tmate_ssh_server_main(struct tmate_session *session,
 struct tmate_settings {
 	const char *keys_dir;
 	const char *authorized_keys_path;
-	int ssh_port;
+	int daemon_ssh_port;
+	int client_ssh_port;
 	int ssh_port_advertized;
 	const char *websocket_hostname;
 	int websocket_port;

@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <event.h>
 #include <arpa/inet.h>
+#include <poll.h>
 #ifndef IPPROTO_TCP
 #include <netinet/in.h>
 #endif
@@ -21,7 +22,7 @@ char *get_ssh_conn_string(const char *session_token)
 	char *ret;
 
 	int ssh_port_advertized = tmate_settings->ssh_port_advertized == -1 ?
-		tmate_settings->ssh_port :
+		tmate_settings->client_ssh_port :
 		tmate_settings->ssh_port_advertized;
 
 	if (ssh_port_advertized != 22)
@@ -208,7 +209,12 @@ static void handle_sigalrm(__unused int sig)
 	tmate_fatal_quiet("Connection grace period (%ds) passed", TMATE_SSH_GRACE_PERIOD);
 }
 
-static void client_bootstrap(struct tmate_session *_session)
+#define BAD_PORT_CLIENT_ERROR_STR				      \
+"Invalid port. This port does not accept tmate client connections.\r\n"
+
+static void client_bootstrap(struct tmate_session *_session,
+                             bool handle_role_daemon,
+                             bool handle_role_pty_client)
 {
 	struct tmate_ssh_client *client = &_session->ssh_client;
 	long grace_period = TMATE_SSH_GRACE_PERIOD;
@@ -267,11 +273,36 @@ static void client_bootstrap(struct tmate_session *_session)
 	register_on_ssh_read(client);
 
 	switch (client->role) {
-	case TMATE_ROLE_DAEMON:		tmate_spawn_daemon(_session);		break;
-	case TMATE_ROLE_PTY_CLIENT:	tmate_spawn_pty_client(_session);	break;
-	case TMATE_ROLE_EXEC:		tmate_spawn_exec(_session);		break;
+	case TMATE_ROLE_DAEMON:
+		if (handle_role_daemon)
+			tmate_spawn_daemon(_session);
+		else
+			tmate_info("Ignoring daemon connection");
+	break;
+	case TMATE_ROLE_PTY_CLIENT:
+		if (handle_role_pty_client)
+			tmate_spawn_pty_client(_session);
+		else
+			tmate_info("Ignoring client connection");
+			ssh_channel_write(client->channel,
+					  BAD_PORT_CLIENT_ERROR_STR,
+					  strlen(BAD_PORT_CLIENT_ERROR_STR));
+	break;
+	case TMATE_ROLE_EXEC:
+		if (handle_role_pty_client)
+			tmate_spawn_exec(_session);
+		else
+			tmate_info("Ignoring client connection");
+			ssh_channel_write(client->channel,
+					  BAD_PORT_CLIENT_ERROR_STR,
+					  strlen(BAD_PORT_CLIENT_ERROR_STR));
+	break;
 	}
-	/* never reached */
+
+	ssh_event_remove_session(mainloop, session);
+	ssh_disconnect(session);
+	ssh_free(session);
+	exit(0);
 }
 
 static int get_client_ip_socket(int fd, char *dst, size_t len)
@@ -452,17 +483,21 @@ static void handle_sigchld(__unused int sig)
 }
 
 void tmate_ssh_server_main(struct tmate_session *session, const char *keys_dir,
-			   const char *bind_addr, int port)
+                           const char *bind_addr, int daemon_port, int client_port)
 {
+	int ret, fd;
 	struct tmate_ssh_client *client = &session->ssh_client;
-	ssh_bind bind;
+	ssh_bind bind, daemon_bind, client_bind;
 	pid_t pid;
-	int fd;
+	struct pollfd fds[2] = {};
+	bool handle_role_daemon = false;
+	bool handle_role_pty_client = false;
 
 	tmate_catch_sigsegv();
 	signal(SIGCHLD, handle_sigchld);
 
-	bind = prepare_ssh(keys_dir, bind_addr, port);
+	daemon_bind = prepare_ssh(keys_dir, bind_addr, daemon_port);
+	client_bind = prepare_ssh(keys_dir, bind_addr, client_port);
 
 	client->session = ssh_new();
 	client->channel = NULL;
@@ -473,7 +508,38 @@ void tmate_ssh_server_main(struct tmate_session *session, const char *keys_dir,
 	if (!client->session)
 		tmate_fatal("Cannot initialize session");
 
+	fds[0].fd = ssh_bind_get_fd(daemon_bind);
+	fds[0].events = POLLIN;
+	fds[1].fd =  ssh_bind_get_fd(client_bind);
+	fds[1].events = POLLIN;
+
 	for (;;) {
+		ret = poll(fds, 2, -1);
+
+		if (ret < 0 && errno == EINTR)
+			continue;
+
+		if (ret < 0)
+			tmate_fatal("Poll failed");
+
+		if (fds[0].revents & POLLIN) {
+			bind = daemon_bind;
+			handle_role_daemon = true;
+			handle_role_pty_client = false;
+		}
+		else if (fds[0].revents & ~POLLIN != 0) {
+			tmate_fatal("Unexpected poll event");
+		}
+
+		if (fds[1].revents & POLLIN) {
+			bind = client_bind;
+			handle_role_daemon = false;
+			handle_role_pty_client = true;
+		}
+		else if (fds[1].revents & ~POLLIN != 0) {
+			tmate_fatal("Unexpected poll event");
+		}
+
 		fd = accept(ssh_bind_get_fd(bind), NULL, NULL);
 		if (fd < 0)
 			tmate_fatal("Error accepting connection");
@@ -506,7 +572,8 @@ void tmate_ssh_server_main(struct tmate_session *session, const char *keys_dir,
 
 		ssh_bind_free(bind);
 
-		client_bootstrap(session);
+		client_bootstrap(session, handle_role_daemon, handle_role_pty_client);
+
 		/* never reached */
 	}
 }
