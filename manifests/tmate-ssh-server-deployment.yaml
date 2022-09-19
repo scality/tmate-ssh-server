@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tmate-ssh-server
+  name: tmate-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tmate-ssh-server
+      app: tmate-server
   template:
     metadata:
       labels:
-        app: tmate-ssh-server
+        app: tmate-server
     spec:
       containers:
       - image: ghcr.io/scality/tmate-ssh-server/tmate-ssh-server:latest
-        name: tmate-ssh-server
+        name: tmate-server
         ports:
           - name: daemon_conn_port
             containerPort: 2200

@@ -2,11 +2,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: tmate-ssh-server
+  name: tmate-server
 spec:
   project: devinfra
   destination:
-    namespace: tmate-ssh-server
+    namespace: tmate-server
     name: 'devinfra-gke'
   source:
     path: manifests/
