@@ -1,0 +1,21 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: guestbook
+spec:
+  project: devinfra
+  destination:
+    namespace: guestbook
+    name: 'devinfra-gke'
+  source:
+    path: guestbook
+    repoURL: https://github.com/argoproj/argocd-example-apps
+    targetRevision: 'HEAD'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
