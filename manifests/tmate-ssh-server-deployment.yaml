@@ -16,9 +16,9 @@ spec:
       - image: ghcr.io/scality/tmate-ssh-server/tmate-ssh-server:latest
         name: tmate-server
         ports:
-          - name: daemon_conn_port
+          - name: daemon-port
             containerPort: 2200
-          - name: client_conn_port
+          - name: client-port
             containerPort: 2201
         env:
           - name: "SSH_PORT_LISTEN_DAEMON"
