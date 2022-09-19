@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tmate-ssh-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tmate-ssh-server
+  template:
+    metadata:
+      labels:
+        app: tmate-ssh-server
+    spec:
+      containers:
+      - image: ghcr.io/scality/tmate-ssh-server/tmate-ssh-server:latest
+        name: tmate-ssh-server
+        ports:
+          - name: daemon_conn_port
+            containerPort: 2200
+          - name: client_conn_port
+            containerPort: 2201
+        env:
+          - name: "SSH_PORT_LISTEN_DAEMON"
+            value: 2200
+          - name: "SSH_PORT_LISTEN_CLIENT"
+            value: 2201
+          - name: "USE_PROXY_PROTOCOLPROTOCOL"
+            value: 0
