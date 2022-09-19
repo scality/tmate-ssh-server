@@ -22,8 +22,8 @@ spec:
             containerPort: 2201
         env:
           - name: "SSH_PORT_LISTEN_DAEMON"
-            value: 2200
+            value: "2200"
           - name: "SSH_PORT_LISTEN_CLIENT"
-            value: 2201
+            value: "2201"
           - name: "USE_PROXY_PROTOCOLPROTOCOL"
-            value: 0
+            value: "0"
