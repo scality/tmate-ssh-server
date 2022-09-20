@@ -1,8 +1,7 @@
 name: action
 on: workflow_dispatch
 jobs:
-  my-job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: step
-        run: echo "Hello World!"
+  docker-build:
+    uses: scality/workflows/.github/workflows/docker-build.yaml@v1
+    with:
+      name: tmate-ssh-server
