@@ -1,5 +1,8 @@
 name: action
-on: workflow_dispatch
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch: {}
 jobs:
   docker-build:
     uses: scality/workflows/.github/workflows/docker-build.yaml@v1
