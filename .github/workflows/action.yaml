@@ -5,10 +5,7 @@ on:
   workflow_dispatch: {}
 jobs:
   docker-build:
-    permissions:
-      actions: read
-      contents: read
-      packages: write
+    permissions: write-all
     uses: scality/workflows/.github/workflows/docker-build.yaml@v1
     with:
       name: tmate-ssh-server
