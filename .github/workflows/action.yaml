@@ -5,3 +5,6 @@ jobs:
     uses: scality/workflows/.github/workflows/docker-build.yaml@v1
     with:
       name: tmate-ssh-server
+      namespace: scality
+      push: true
+      tag: latest
