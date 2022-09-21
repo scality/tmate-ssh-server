@@ -1,11 +1,10 @@
 name: action
 on:
   push:
-    branches: ['**']
+    branches: ['master']
   workflow_dispatch: {}
 jobs:
   docker-build:
-    permissions: write-all
     uses: scality/workflows/.github/workflows/docker-build.yaml@v1
     with:
       name: tmate-ssh-server
