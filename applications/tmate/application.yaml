@@ -7,7 +7,7 @@ spec:
   project: devinfra
   destination:
     namespace: tmate-server
-    name: 'devinfra-gke'
+    name: 'devinfra-prod'
   source:
     path: manifests/
     repoURL: https://github.com/scality/tmate-ssh-server/
