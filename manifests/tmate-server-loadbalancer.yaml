@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tmate-server-lb
+spec:
+# https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters#fw_ip_address
+  loadBalancerSourceRanges:
+  - 141.94.181.72/32  # vpn EU, dec 2021
+  - 15.235.0.112/32   # vpn US, dec 2021
+  - 172.105.238.42/32 # vpn JP, dec 2021
+  - 178.32.74.133/32  # vpn.scality.com - French VPN
+  - 94.23.9.26/24  # VPN access
+  - 84.199.71.255/16  # VPN access
+  - 199.193.114.181/32  # vpn-us.scality.com
+  - 198.27.75.58/32  # Alternate VPN access (USA)
+  - 106.185.39.162/32  # vpn-jp.scality.com
+  - 84.14.13.200/20  # Scality Paris
+  - 206.80.236.240/29 # Scality SF
+  - 73.132.68.200/32  # Scality Reston
+  - 10.0.0.0/8  # internal network (kubernetes)
+  ports:
+  - name: daemon-port
+    protocol: TCP
+    port: 2200 # Port on the service
+    targetPort: 2200 # Port on the pod
+  - name: client-port
+    protocol: TCP
+    port: 2201 # Port on the service
+    targetPort: 2201 # Port on the pod
+  selector:
+    # Labels that match the targgeting pods
+    app.kubernetes.io/name: tmate-server
+  sessionAffinity: None
+  type: LoadBalancer
