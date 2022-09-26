@@ -1,0 +1,16 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: tmate-server-ed25519-key
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: gcs-secret-store
+  target:
+    name: tmate-server-ed25519-key
+    creationPolicy: Owner
+  data:
+  - secretKey: tmate-server-ed25519-key
+    remoteRef:
+      key: tmate-server-ed25519-key
