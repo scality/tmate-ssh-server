@@ -29,6 +29,6 @@ spec:
     targetPort: 2201 # Port on the pod
   selector:
     # Labels that match the targgeting pods
-    app.kubernetes.io/name: tmate-server
+    app: tmate-server
   sessionAffinity: None
   type: LoadBalancer
