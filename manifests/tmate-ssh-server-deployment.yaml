@@ -15,6 +15,9 @@ spec:
       containers:
       - image: ghcr.io/scality/tmate-ssh-server/tmate-ssh-server:latest
         name: tmate-server
+        volumeMounts:
+          - name:  ssh-host-keys
+            mountPath: "/volume"
         ports:
           - name: daemon-port
             containerPort: 2200
@@ -27,3 +30,13 @@ spec:
             value: "2201"
           - name: "USE_PROXY_PROTOCOLPROTOCOL"
             value: "0"
+          - name: "SSH_KEYS_PATH"
+            value: "/etc/tmate-ssh-server/keys"
+      volumes:
+        - name: ssh-host-keys
+          projected:
+            sources:
+            - secret:
+                name: tmate-server-rsa-key
+            - secret:
+                name: tmate-server-ed25519-key
