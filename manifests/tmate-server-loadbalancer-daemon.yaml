@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: tmate-server-lb
+  name: tmate-server-lb-daemon
 spec:
 # https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters#fw_ip_address
   ports:
