@@ -19,10 +19,6 @@ spec:
   - 73.132.68.200/32  # Scality Reston
   - 10.0.0.0/8  # internal network (kubernetes)
   ports:
-  - name: daemon-port
-    protocol: TCP
-    port: 2200 # Port on the service
-    targetPort: 2200 # Port on the pod
   - name: client-port
     protocol: TCP
     port: 2201 # Port on the service
