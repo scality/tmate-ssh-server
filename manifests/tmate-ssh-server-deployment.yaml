@@ -13,7 +13,7 @@ spec:
         app: tmate-server
     spec:
       containers:
-      - image: ghcr.io/scality/tmate-ssh-server/tmate-ssh-server:latest
+      - image: ghcr.io/scality/tmate-ssh-server:latest@sha256:413c0c7034be9a2ee8f7df379f9bb715fe80083ff016602db60aafb69b659914
         name: tmate-server
         volumeMounts:
           - name:  ssh-host-keys
