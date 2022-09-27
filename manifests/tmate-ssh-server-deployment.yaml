@@ -32,6 +32,9 @@ spec:
             value: "0"
           - name: "SSH_KEYS_PATH"
             value: "/etc/tmate-ssh-server/keys"
+        securityContext:
+          capabilities:
+            add: ["SYS_ADMIN"]
       volumes:
         - name: ssh-host-keys
           projected:
