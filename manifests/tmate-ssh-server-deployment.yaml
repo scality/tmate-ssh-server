@@ -28,10 +28,12 @@ spec:
             value: "2200"
           - name: "SSH_PORT_LISTEN_CLIENT"
             value: "2201"
-          - name: "USE_PROXY_PROTOCOLPROTOCOL"
+          - name: "USE_PROXY_PROTOCOL"
             value: "0"
           - name: "SSH_KEYS_PATH"
             value: "/etc/tmate-ssh-server/keys"
+          - name: "SSH_HOSTNAME"
+            value: "ssh.ci.scality.net"
         securityContext:
           capabilities:
             add: ["SYS_ADMIN"]
