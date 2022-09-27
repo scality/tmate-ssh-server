@@ -18,6 +18,8 @@ spec:
   - 206.80.236.240/29 # Scality SF
   - 73.132.68.200/32  # Scality Reston
   - 10.0.0.0/8  # internal network (kubernetes)
+  - 217.182.11.6/32 # NAT outbound (for VMs) (EU)
+  - 144.217.45.142/32 # NAT outbound (for VMs) (US)
   ports:
   - name: client-port
     protocol: TCP
