@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tmate-server-lb
+spec:
+# https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters#fw_ip_address
+  ports:
+  - name: daemon-port
+    protocol: TCP
+    port: {{ .Values.daemonPort }} # Port on the service
+    targetPort: {{ .Values.daemonPort }} # Port on the pod
+  selector:
+    # Labels that match the targgeting pods
+    app: {{ include "tmate-server.name" . }}
+  sessionAffinity: None
+  type: LoadBalancer
