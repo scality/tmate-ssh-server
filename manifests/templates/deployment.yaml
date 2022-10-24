@@ -44,15 +44,19 @@ spec:
               value:  {{ .value | quote }}
             {{- end }}
           volumeMounts:
+            - name:  ssh-host-keys
+              mountPath: /volume
             {{- range .Values.volumeMounts }}
             - name: {{ .name }}
               mountPath:  {{ .mountPath | quote }}
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-
-      {{- with .Values.volumes }}
       volumes:
+      - name: ssh-host-keys
+        secret:
+          secretName: {{ include "tmate-server.fullname" . }}
+      {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
