@@ -27,6 +27,10 @@ podAnnotations: {}
 podSecurityContext: {}
   # fsGroup: 2000
 
+# Content for tmate keys
+tmateServerRsaKey: "rsakey"
+tmateServerEd25519Key: "ed25519key"
+
 securityContext:
   capabilities:
     add:
