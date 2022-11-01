@@ -34,11 +34,23 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
+            - name: daemon-port
+              containerPort: {{ .Values.daemonPort }}
+            - name: client-port
+              containerPort: {{ .Values.clientPort }}
             {{- range .Values.ports }}
             - name: {{ .name }}
               containerPort:  {{ .containerPort }}
             {{- end }}
           env:
+            - name: "SSH_PORT_LISTEN_DAEMON"
+              value: "{{ .Values.daemonPort }}"
+            - name: "SSH_PORT_LISTEN_CLIENT"
+              value: "{{ .Values.clientPort }}"
+            - name: "USE_PROXY_PROTOCOL"
+              value: "0"
+            - name: "SSH_KEYS_PATH"
+              value: "/etc/tmate-ssh-server/keys"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value:  {{ .value | quote }}

@@ -46,6 +46,13 @@ service:
   type: ClusterIP
   port: 80
 
+
+daemonPort: 2200
+clientPort: 2201
+
+clientAnnotations: {}
+daemonAnnotations: {}
+
 ingress:
   enabled: false
   className: ""
